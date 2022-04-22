@@ -40,6 +40,7 @@ import DownloadReport from "./pages/DownloadReport";
 import { getTeam } from "./api/teams api/teams";
 import { Role } from "./_helpers/role";
 import { getReports } from "./api/reports api/reports";
+import Reset from "./pages/Reset";
 
 // ----------------------------------------------------------------------
 
@@ -77,15 +78,17 @@ export default function Router() {
   const { dispatchAdminAllEmployee } = useContext(employeeContext);
 
   React.useLayoutEffect(() => {
-    getClient(dispatchClientDetails);
-    if (Role.indexOf(loginC.userData.role <= 2)) getTeam(dispatchgetTeam);
-    if (loginC?.userData?.role === "admin")
-      getAllEmployee(dispatchAdminAllEmployee);
-    else if (loginC?.userData?.role === "manager")
-      getTeamCommonData(dispatchTeamCommonData);
-    else if (loginC?.userData?.role === "projectLeader")
-      projectMemberCommonData(dispatchProjectMemberData);
-    getCommonData(dispatchCommonData);
+    if (loginC) {
+      getClient(dispatchClientDetails);
+      if (Role.indexOf(loginC.userData.role <= 2)) getTeam(dispatchgetTeam);
+      if (loginC?.userData?.role === "admin")
+        getAllEmployee(dispatchAdminAllEmployee);
+      else if (loginC?.userData?.role === "manager")
+        getTeamCommonData(dispatchTeamCommonData);
+      else if (loginC?.userData?.role === "projectLeader")
+        projectMemberCommonData(dispatchProjectMemberData);
+      getCommonData(dispatchCommonData);
+    }
   }, [commonData]);
   const getOptions = async () => {
     axios.post("/report/options").then((res) => {
@@ -105,7 +108,9 @@ export default function Router() {
     });
   };
   React.useEffect(() => {
-    getOptions();
+    if (loginC) {
+      getOptions();
+    }
   }, []);
   React.useEffect(() => {
     disableStateFunc(false);
@@ -226,6 +231,7 @@ export default function Router() {
         { path: "*", element: <Navigate to="/404" /> },
         { path: "/reports/sharedReports/:id", element: <SavedReports /> },
         { path: "/downloadReportPdf/:id", element: <DownloadReport /> },
+        { path: "/passwordReset/:id/:token", element: <Reset /> },
       ],
     },
     // { path: '#', element: <Navigate to="/UserDetails" /> },
